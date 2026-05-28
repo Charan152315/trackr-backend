@@ -58,7 +58,10 @@ def upgrade() -> None:
     op.drop_column('settlements', 'timestamp')
     op.create_index(op.f('ix_splits_group_expense_id'), 'splits', ['group_expense_id'], unique=False)
     op.create_index(op.f('ix_splits_user_id'), 'splits', ['user_id'], unique=False)
-    op.drop_column('splits', 'paid_by_username')
+    try:
+        op.drop_column('splits', 'paid_by_username')
+    except:
+        pass
     op.alter_column('users', 'email',
                existing_type=sa.VARCHAR(length=255),
                type_=sa.String(length=100),
