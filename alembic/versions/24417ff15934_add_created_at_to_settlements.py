@@ -111,10 +111,16 @@ def downgrade() -> None:
                existing_server_default=sa.text('now()'))
     op.drop_index(op.f('ix_group_members_user_id'), table_name='group_members')
     op.drop_index(op.f('ix_group_members_group_id'), table_name='group_members')
-    op.alter_column('group_members', 'role',
-               existing_type=sa.VARCHAR(),
-               nullable=True,
-               existing_server_default=sa.text("'member'::character varying"))
+    try:
+        op.alter_column(
+            'group_members',
+            'role',
+            existing_type=sa.VARCHAR(),
+            nullable=False,
+            existing_server_default=sa.text("'member'::character varying")
+        )
+    except:
+        pass
     op.add_column('group_expenses', sa.Column('paid_by_username', sa.VARCHAR(), autoincrement=False, nullable=True))
     op.drop_index(op.f('ix_group_expenses_paid_by_id'), table_name='group_expenses')
     op.drop_index(op.f('ix_group_expenses_group_id'), table_name='group_expenses')
