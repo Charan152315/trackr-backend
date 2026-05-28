@@ -63,9 +63,14 @@ def upgrade() -> None:
     op.create_index(op.f('ix_settlements_from_user_id'), 'settlements', ['from_user_id'], unique=False)
     op.create_index(op.f('ix_settlements_group_id'), 'settlements', ['group_id'], unique=False)
     op.create_index(op.f('ix_settlements_to_user_id'), 'settlements', ['to_user_id'], unique=False)
-    op.drop_column('settlements', 'to_username')
-    op.drop_column('settlements', 'from_username')
-    op.drop_column('settlements', 'timestamp')
+    if column_exists('settlements', 'to_username'):
+        op.drop_column('settlements', 'to_username')
+
+    if column_exists('settlements', 'from_username'):
+        op.drop_column('settlements', 'from_username')
+
+    if column_exists('settlements', 'timestamp'):
+        op.drop_column('settlements', 'timestamp')
     op.create_index(op.f('ix_splits_group_expense_id'), 'splits', ['group_expense_id'], unique=False)
     op.create_index(op.f('ix_splits_user_id'), 'splits', ['user_id'], unique=False)
     if column_exists('splits', 'paid_by_username'):
