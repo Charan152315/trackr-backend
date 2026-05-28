@@ -22,6 +22,7 @@ This is a fully functional backend **Expense Tracker API** built using **FastAPI
 
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/Charan152315/expense-tracker-api.git
 cd expense-tracker-api

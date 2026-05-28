@@ -1,5 +1,34 @@
-.env 
-venv/ 
-__pycache__/ 
-.pytest_cache/ 
-.vscode/ 
+# Environment variables
+.env
+.env.*
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Build
+dist/
+build/
+
+# Database (if local sqlite ever used)
+*.db
+*.sqlite3
