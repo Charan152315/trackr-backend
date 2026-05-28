@@ -38,10 +38,16 @@ def upgrade() -> None:
         op.drop_column('group_expenses', 'paid_by_username')
     except:
         pass
-    op.alter_column('group_members', 'role',
-               existing_type=sa.VARCHAR(),
-               nullable=False,
-               existing_server_default=sa.text("'member'::character varying"))
+    try:
+        op.alter_column(
+            'group_members',
+            'role',
+            existing_type=sa.VARCHAR(),
+            nullable=False,
+            existing_server_default=sa.text("'member'::character varying")
+        )
+    except:
+        pass
     op.create_index(op.f('ix_group_members_group_id'), 'group_members', ['group_id'], unique=False)
     op.create_index(op.f('ix_group_members_user_id'), 'group_members', ['user_id'], unique=False)
     op.alter_column('groups', 'created_at',
