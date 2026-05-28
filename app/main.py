@@ -16,11 +16,13 @@ app=FastAPI(title="Expense Tracker API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173",
-                   "https://trackr-frontend-one.vercel.app/"
+                   "https://trackr-frontend-one.vercel.app/",
+                   "https://trackr-frontend-one.vercel.app",
                    ], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 app.include_router(notifications.router)
