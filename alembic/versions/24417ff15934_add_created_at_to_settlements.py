@@ -34,7 +34,10 @@ def upgrade() -> None:
                nullable=False)
     op.create_index(op.f('ix_group_expenses_group_id'), 'group_expenses', ['group_id'], unique=False)
     op.create_index(op.f('ix_group_expenses_paid_by_id'), 'group_expenses', ['paid_by_id'], unique=False)
-    op.drop_column('group_expenses', 'paid_by_username')
+    try:
+        op.drop_column('group_expenses', 'paid_by_username')
+    except:
+        pass
     op.alter_column('group_members', 'role',
                existing_type=sa.VARCHAR(),
                nullable=False,
