@@ -533,8 +533,12 @@ def delete_group_expense(
     ).delete()
     db.commit()
 
+    desc = expense.description
+    amt = expense.amount
     db.delete(expense)
     db.commit()
+    
+    log_activity(db, current_user.id, "delete_expense", f"Deleted group expense '{desc}' ₹{amt}", "group", group_id)
 
 
 # ==================== GROUP EXPENSES - UPDATE DESCRIPTION ====================

@@ -343,6 +343,7 @@ def update_expense(
     db.commit()
     db.refresh(expense)
 
+    log_activity(db, current_user.id, "update_expense", f"Updated expense '{expense.title}' ₹{expense.amount} [{expense.category}]", "expense", expense_id)
     logger.info(f"Expense updated: {expense_id}")
     return expense
 
@@ -368,10 +369,14 @@ def delete_expense(
             detail="Expense not found"
         )
 
+    title = expense.title
+    amount = expense.amount
     expense_query.delete(synchronize_session=False)
     db.commit()
 
+    log_activity(db, current_user.id, "delete_expense", f"Deleted expense '{title}' ₹{amount}", "expense", expense_id)
     logger.info(f"Expense deleted: {expense_id}")
+
 
 
 # ==================== GET MONTHLY SUMMARY ====================
