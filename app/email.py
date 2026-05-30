@@ -22,17 +22,13 @@ def send_email(to_email: str, subject: str, html_content: str, text_content:str=
         message.attach(text_part)
         message.attach(html_part)
 
-        with smtplib.SMTP(
+        with smtplib.SMTP_SSL(
             settings.smtp_host,
-            settings.smtp_port,
+            int(settings.smtp_port),
             timeout=20
         ) as server:
 
             server.set_debuglevel(1)
-
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
 
             server.login(
                 settings.smtp_username,
@@ -40,7 +36,7 @@ def send_email(to_email: str, subject: str, html_content: str, text_content:str=
             )
 
             server.send_message(message)
-
+            
         logger.info(f"Email sent successfully to {to_email}")
         return True
 
