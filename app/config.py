@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
     
+
+    # Email settings - resend.com
+    resend_api_key: str = ""
+    
     # Email settings - ADD THESE
     smtp_host: str
     smtp_port: int
