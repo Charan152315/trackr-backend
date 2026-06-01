@@ -50,7 +50,7 @@ def create_settlement(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You are not a member of this group"
         )
-
+    
     # Verify recipient is member of group
     recipient_member = db.query(models.GroupMember).filter(
         and_(
@@ -63,6 +63,79 @@ def create_settlement(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Recipient is not a member of this group"
+        )
+    
+    # ==================== BALANCE VALIDATION ====================
+
+    balances_data = {}
+
+    expenses = db.query(models.GroupExpense).filter(
+        models.GroupExpense.group_id == group_id
+    ).all()
+
+    for expense in expenses:
+        paid_by = expense.paid_by_id
+
+        splits = db.query(models.Split).filter(
+            models.Split.group_expense_id == expense.id
+        ).all()
+
+        for split in splits:
+            balances_data.setdefault(split.user_id, 0.0)
+            balances_data.setdefault(paid_by, 0.0)
+
+            balances_data[split.user_id] -= float(split.amount)
+            balances_data[paid_by] += float(split.amount)
+
+    # Adjust for confirmed settlements
+    confirmed = db.query(models.Settlement).filter(
+        and_(
+            models.Settlement.group_id == group_id,
+            models.Settlement.status == "confirmed"
+        )
+    ).all()
+
+    for s in confirmed:
+        balances_data[s.from_user_id] = (
+            balances_data.get(s.from_user_id, 0)
+            + float(s.amount)
+        )
+
+        balances_data[s.to_user_id] = (
+            balances_data.get(s.to_user_id, 0)
+            - float(s.amount)
+        )
+
+    # Current user balance
+    my_balance = balances_data.get(
+        current_user.id,
+        0.0
+    )
+
+    recipient_balance = balances_data.get(
+        settlement_data.to_user_id,
+        0.0
+    )
+
+    # Max amount current user owes
+    max_owed = round(
+        -my_balance if my_balance < 0 else 0,
+        2
+    )
+
+    if settlement_data.amount <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Amount must be greater than 0"
+        )
+
+    if max_owed > 0 and settlement_data.amount > max_owed:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"You can only settle up to ₹{max_owed}. "
+                f"That's what you owe."
+            )
         )
 
     # Verify both users have valid UPI
