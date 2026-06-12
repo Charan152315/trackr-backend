@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
-    
+    redis_url: str
 
     # Email settings - resend.com
     resend_api_key: str = ""

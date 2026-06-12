@@ -33,6 +33,7 @@ pytest==8.4.1
 python-dotenv==1.1.0
 python-jose==3.5.0
 python-multipart==0.0.20
+redis==8.0.0
 reportlab==4.5.1
 requests==2.34.2
 resend==2.30.1

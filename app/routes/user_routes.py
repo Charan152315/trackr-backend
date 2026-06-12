@@ -5,9 +5,9 @@ from .. import schemas, models, utils, database, auth, email as email_utils
 from ..auth import create_reset_token
 from ..config import settings
 import random
-import time
 
-_otp_store = {}  # {user_id: {otp, new_email, expires}}
+from app.redis_client import redis_client
+# we use redis for this _otp_store = {}  # {user_id: {otp, new_email, expires}}
 
 import logging
 import traceback
@@ -247,11 +247,11 @@ def request_email_change(
         raise HTTPException(status_code=400, detail="Email already in use")
 
     otp = str(random.randint(100000, 999999))
-    _otp_store[current_user.id] = {
-        "otp": otp,
-        "new_email": new_email,
-        "expires": time.time() + 600  # 10 minutes
-    }
+    redis_client.setex(
+        f"email_otp:{current_user.id}",
+        600,
+        f"{otp}:{new_email}"
+    )
 
     from app.email import send_email
     try:
@@ -287,26 +287,43 @@ def confirm_email_change(
     current_user: models.User = Depends(auth.get_current_user)
 ):
     otp_input = payload.get("otp")
-    stored = _otp_store.get(current_user.id)
+
+    stored = redis_client.get(
+        f"email_otp:{current_user.id}"
+    )
 
     if not stored:
-        raise HTTPException(status_code=400, detail="No OTP request found. Please request again.")
-    if time.time() > stored["expires"]:
-        del _otp_store[current_user.id]
-        raise HTTPException(status_code=400, detail="OTP expired. Please request again.")
-    if stored["otp"] != otp_input:
-        raise HTTPException(status_code=400, detail="Incorrect OTP")
+        raise HTTPException(
+            status_code=400,
+            detail="No OTP request found. Please request again."
+        )
 
-    new_email = stored["new_email"]
+    stored_otp, new_email = stored.split(":", 1)
+
+    if stored_otp != otp_input:
+        raise HTTPException(
+            status_code=400,
+            detail="Incorrect OTP"
+        )
+
     existing = db.query(models.User).filter(
         models.User.email == new_email,
         models.User.id != current_user.id
     ).first()
+
     if existing:
-        raise HTTPException(status_code=400, detail="Email already taken")
+        raise HTTPException(
+            status_code=400,
+            detail="Email already taken"
+        )
 
     current_user.email = new_email
     db.commit()
-    del _otp_store[current_user.id]
 
-    return {"message": "Email updated successfully"}
+    redis_client.delete(
+        f"email_otp:{current_user.id}"
+    )
+
+    return {
+        "message": "Email updated successfully"
+    }
