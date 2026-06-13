@@ -66,17 +66,6 @@ jobs:
             echo "Waiting for postgres..."; sleep 2;
           done
 
-      - name: Create test database if it doesn't exist
-        run: |
-          sudo apt-get install -y postgresql-client
-          DB_EXISTS=$(PGPASSWORD=${{ secrets.DATABASE_PASSWORD }} psql -h localhost -U ${{ secrets.DATABASE_USERNAME }} -tAc "SELECT 1 FROM pg_database WHERE datname='${{ secrets.TEST_DATABASE_NAME }}'")
-          if [ "$DB_EXISTS" != "1" ]; then
-            echo "Creating test database..."
-            PGPASSWORD=${{ secrets.DATABASE_PASSWORD }} psql -h localhost -U ${{ secrets.DATABASE_USERNAME }} -c "CREATE DATABASE ${{ secrets.TEST_DATABASE_NAME }};"
-          else
-            echo "Test database already exists."
-          fi
-
       - name: Run tests
         run: |
           pip install pytest
