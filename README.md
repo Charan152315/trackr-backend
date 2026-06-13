@@ -1,6 +1,5 @@
 # Trackr — Full-Stack Expense Management App
 
-[![CI](https://github.com/yourusername/trackr-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/Charan152315/trackr-backend/actions)
 
 Trackr is a production-grade, full-stack expense management application built with **FastAPI**, **React 19**, **PostgreSQL**, and **Redis**. It supports personal expense tracking, group bill splitting, UPI-based settlements, visual analytics, and real-time notifications.
 
@@ -81,7 +80,7 @@ Trackr is a production-grade, full-stack expense management application built wi
 ### Backend — Local Development
 
 ```bash
-git clone git clone https://github.com/Charan152315/trackr-backend.git
+git clone  https://github.com/Charan152315/trackr-backend.git
 cd trackr-backend
 
 # Copy env file
@@ -99,7 +98,7 @@ uvicorn app.main:app --reload
 ### Frontend — Local Development
 
 ```bash
-git clone git clone https://github.com/Charan152315/trackr-frontend.git
+git clone  https://github.com/Charan152315/trackr-frontend.git
 cd trackr-frontend
 npm install
 cp .env.example .env        # set VITE_API_URL=http://localhost:8000
