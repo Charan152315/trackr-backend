@@ -25,15 +25,26 @@ jobs:
 
     env:
       ENV: test
+
       DATABASE_HOSTNAME: localhost
       DATABASE_PORT: 5432
       DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
       DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
       TEST_DATABASE_NAME: ${{ secrets.TEST_DATABASE_NAME }}
+
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALGORITHM: ${{ secrets.ALGORITHM }}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+
+      SMTP_FROM_NAME: ${{ secrets.SMTP_FROM_NAME }}
+      SMTP_FROM_EMAIL: ${{ secrets.SMTP_FROM_EMAIL }}
+
+      FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
 
     steps:
       - name: Checkout code

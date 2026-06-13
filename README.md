@@ -1,10 +1,10 @@
 # Trackr — Full-Stack Expense Management App
 
-[![CI](https://github.com/yourusername/trackr-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/trackr-backend/actions)
+[![CI](https://github.com/yourusername/trackr-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/Charan152315/trackr-backend/actions)
 
 Trackr is a production-grade, full-stack expense management application built with **FastAPI**, **React 19**, **PostgreSQL**, and **Redis**. It supports personal expense tracking, group bill splitting, UPI-based settlements, visual analytics, and real-time notifications.
 
-**Live:** [trackr.vercel.app](https://your-trackr.vercel.app) — Backend on Railway, Frontend on Vercel
+**Live:** [trackr.vercel.app](https://trackr-frontend-one.vercel.app/) — Backend on Railway, Frontend on Vercel
 
 ---
 
@@ -19,7 +19,6 @@ Trackr is a production-grade, full-stack expense management application built wi
 - In-app notifications and activity audit log
 - CSV and PDF export with ReportLab
 - OTP-based email change flow backed by Redis
-- Rate limiting on auth endpoints via SlowAPI
 - Dark mode with localStorage persistence
 - Fully responsive — mobile and desktop
 
@@ -49,8 +48,7 @@ Trackr is a production-grade, full-stack expense management application built wi
 └──────────┘ └──────────┘ └──────────┘
 
 **Redis is used for:**
-- OTP storage with TTL (email change, UPI verification) — replaces fragile in-memory dict
-- Rate limiter backend — works across multiple API instances
+- OTP storage with TTL for email-change verification (replaces in-memory storage)
 - Future: session caching, notification unread counts
 
 **Why not Kafka?** Trackr is a monolith. Kafka suits microservices with high-throughput event streams. Adding it here would be over-engineering. Planned for v2 if the architecture splits.
@@ -83,7 +81,7 @@ Trackr is a production-grade, full-stack expense management application built wi
 ### Backend — Local Development
 
 ```bash
-git clone https://github.com/yourusername/trackr-backend
+git clone git clone https://github.com/Charan152315/trackr-backend.git
 cd trackr-backend
 
 # Copy env file
@@ -101,7 +99,7 @@ uvicorn app.main:app --reload
 ### Frontend — Local Development
 
 ```bash
-git clone https://github.com/yourusername/trackr-frontend
+git clone git clone https://github.com/Charan152315/trackr-frontend.git
 cd trackr-frontend
 npm install
 cp .env.example .env        # set VITE_API_URL=http://localhost:8000
@@ -269,7 +267,7 @@ app/
 **Charan Sri Chintamaneni**
 Student @ NIT Raipur — Backend + DevOps
 
-[LinkedIn](https://linkedin.com/in/charansri-chintamaneni) · [GitHub](https://github.com/yourusername)
+[LinkedIn](https://linkedin.com/in/charansri-chintamaneni) · [GitHub](https://github.com/Charan152315)
 
 ---
 
