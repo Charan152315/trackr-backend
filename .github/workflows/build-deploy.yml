@@ -41,6 +41,11 @@ jobs:
 
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
 
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+
       SMTP_FROM_NAME: ${{ secrets.SMTP_FROM_NAME }}
       SMTP_FROM_EMAIL: ${{ secrets.SMTP_FROM_EMAIL }}
 
