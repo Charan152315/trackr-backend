@@ -6,7 +6,7 @@ import os
 from app.routes import auth,expense_routes,user_routes,group_routes
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import settlements
-from app.routes import notifications, activity
+from app.routes import notifications, activity, invites
 
 
 #Base.metadata.create_all(bind=engine)
@@ -32,6 +32,7 @@ app.include_router(auth.router)
 app.include_router(expense_routes.router)
 app.include_router(user_routes.router)
 app.include_router(group_routes.router)
+app.include_router(invites.router)
 
 
 @app.get("/")

@@ -107,8 +107,7 @@ def add_member(
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(auth.get_current_user)
 ):
-    """Add member to group (admin only)."""
-    # Check if current user is admin
+    """Send a group invite request to a user (admin only). User must accept."""
     admin_member = db.query(models.GroupMember).filter(
         and_(
             models.GroupMember.group_id == group_id,
@@ -116,65 +115,49 @@ def add_member(
             models.GroupMember.role == "admin"
         )
     ).first()
-    
     if not admin_member:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can add members"
-        )
-    group = db.query(models.Group).filter(
-        models.Group.id == group_id
-    ).first()
+        raise HTTPException(status_code=403, detail="Only admins can invite members")
 
+    group = db.query(models.Group).filter(models.Group.id == group_id).first()
     if not group:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Group not found"
-        ) 
-    # Find user to add
-    user_to_add = db.query(models.User).filter(
-        models.User.username == member_data.username
-    ).first()
-    
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    user_to_add = db.query(models.User).filter(models.User.username == member_data.username).first()
     if not user_to_add:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=404, detail="User not found")
 
-    # Check if already member
+    if user_to_add.id == current_user.id:
+        raise HTTPException(status_code=400, detail="You can't invite yourself")
+
     existing = db.query(models.GroupMember).filter(
+        and_(models.GroupMember.group_id == group_id, models.GroupMember.user_id == user_to_add.id)
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="User already in group")
+
+    pending = db.query(models.GroupInviteRequest).filter(
         and_(
-            models.GroupMember.group_id == group_id,
-            models.GroupMember.user_id == user_to_add.id
+            models.GroupInviteRequest.group_id == group_id,
+            models.GroupInviteRequest.invited_user_id == user_to_add.id,
+            models.GroupInviteRequest.status == "pending"
         )
     ).first()
-    
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User already in group"
-        )
+    if pending:
+        raise HTTPException(status_code=400, detail="Invite already sent and pending")
 
-    # Add as member
-    new_member = models.GroupMember(
-        user_id=user_to_add.id,
+    invite_req = models.GroupInviteRequest(
         group_id=group_id,
-        role="member"
+        invited_user_id=user_to_add.id,
+        invited_by_id=current_user.id,
+        status="pending"
     )
-    db.add(new_member)
+    db.add(invite_req)
     db.commit()
-    db.refresh(new_member)
-    create_notification(
-        db, user_to_add.id,
-        "Added to group",
-        f"{current_user.username} added you to group '{group.name}'",
-        "info"
-    )
-    log_activity(db, current_user.id, "add_member", f"Added {user_to_add.username} to {group.name}", "group", group_id)
+    db.refresh(invite_req)
 
-    return {"message": f"{member_data.username} added successfully"}
+    log_activity(db, current_user.id, "invite_member", f"Invited {user_to_add.username} to {group.name}", "group", group_id)
 
+    return {"message": f"Invite sent to {member_data.username}"}
 
 # ==================== REMOVE MEMBER ====================
 @router.delete("/{group_id}/remove_member", status_code=status.HTTP_200_OK)

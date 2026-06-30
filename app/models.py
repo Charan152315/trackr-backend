@@ -66,6 +66,31 @@ class Group(Base):
     individual_expenses = relationship("Expense", back_populates="group", cascade="all, delete")
     settlements = relationship("Settlement", back_populates="group", cascade="all, delete")
 
+class GroupInvite(Base):
+    __tablename__ = "group_invites"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    group_id = Column(Integer, ForeignKey("groups.id", ondelete="CASCADE"), nullable=False, index=True)
+    code = Column(String(12), unique=True, nullable=False, index=True)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    expires_at = Column(TIMESTAMP(timezone=True), nullable=True)  # null = never expires
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'), nullable=False)
+
+    group = relationship("Group", backref="invites")
+
+class GroupInviteRequest(Base):
+    __tablename__ = "group_invite_requests"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    group_id = Column(Integer, ForeignKey("groups.id", ondelete="CASCADE"), nullable=False, index=True)
+    invited_user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    invited_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    status = Column(String(20), default="pending", nullable=False)  # pending, accepted, rejected
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'), nullable=False)
+    resolved_at = Column(TIMESTAMP(timezone=True), nullable=True)
+
+    group = relationship("Group", backref="invite_requests")
 
 class GroupMember(Base):
     __tablename__ = "group_members"
